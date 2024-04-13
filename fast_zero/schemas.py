@@ -6,7 +6,7 @@ class Message(BaseModel):
 
 
 class Base(BaseModel):
-    id: int | None  # acredito que o none não t.á funfando como opcional
+    id: int
 
 
 class UserSchemaBase(BaseModel):
