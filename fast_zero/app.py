@@ -69,6 +69,13 @@ def read_users():
     return {'users': database}
 
 
+@app.get('/users/{user_id}', status_code=200, response_model=UserSchemaOut)
+def read_user(user_id: int):
+    check_invalid_user(user_id=user_id)
+
+    return database[user_id - 1]
+
+
 @app.put('/users/{user_id}', status_code=200, response_model=UserSchemaOut)
 def update_user(user_id: int, user: UserSchemaIn):
     check_invalid_user(user_id=user_id)
