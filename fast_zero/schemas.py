@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class Message(BaseModel):
@@ -15,15 +15,17 @@ class UserSchemaBase(BaseModel):
 
 
 class UserSchemaOut(Base, UserSchemaBase):  # schema UserPublic no site
-    pass
+    # converte o modelo do sqlalchemy para que o pydantic consiga ler
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserSchemaIn(UserSchemaBase):
     password: str
 
 
-class UserDB(Base, UserSchemaIn):
-    pass
+# class UserDB(Base, UserSchemaIn):
+#     # usando apenas quando o DB era em memória
+#     pass
 
 
 class UserList(BaseModel):
