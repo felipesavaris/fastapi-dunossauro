@@ -89,9 +89,10 @@ def test_read_user_by_id_return_error_404_not_found(client):
     assert response.json() == {'detail': 'User not found'}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
-        '/users/1',
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'Alice A',
             'email': 'alice@example.com',
@@ -107,7 +108,7 @@ def test_update_user(client, user):
     }
 
 
-def test_update_user_when_raise_status_code_404(client):
+def test_update_user_when_raise_status_code_401(client):
     response = client.put(
         '/users/0',
         json={
@@ -117,19 +118,36 @@ def test_update_user_when_raise_status_code_404(client):
         },
     )
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
 
 
-def test_delete_user(client, user):
-    response = client.delete('/users/1')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == 200
     assert response.json() == {'message': 'User deleted'}
 
 
-def test_delete_user_when_raise_status_code_404(client):
+def test_delete_user_when_raise_status_code_401(client):
     response = client.delete('/users/0')
 
-    assert response.status_code == 404
-    assert response.json() == {'detail': 'User not found'}
+    assert response.status_code == 401
+    assert response.json() == {'detail': 'Not authenticated'}
+
+
+# Criar um teste de delete estando autenticado, mas passando um id inválido, ex: 0
+
+
+def test_create_access_token_return_success(client, user):
+    data = {'username': user.email, 'password': user.clean_password}
+
+    response = client.post('/token', data=data)
+    token = response.json()
+
+    assert response.status_code == 201
+    assert 'access_token' in token
+    assert 'token_type' in token

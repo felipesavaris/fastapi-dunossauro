@@ -7,6 +7,7 @@ from sqlalchemy.pool import StaticPool
 from fast_zero.app import app
 from fast_zero.database import get_session
 from fast_zero.models import Base, User
+from fast_zero.security import get_password_hash
 
 # fixture usada quando tínhamos um DB irreal, em memória = []
 # @pytest.fixture
@@ -49,9 +50,25 @@ def session():
 
 @pytest.fixture
 def user(session):
-    user = User(username='Teste', password='123', email='teste@tes.com')
+    user = User(
+        username='Teste',
+        password=get_password_hash('123'),
+        email='teste@tes.com',
+    )
     session.add(user)
     session.commit()
     session.refresh(user)
 
+    # monkey patching -> add um atributo em tempo de execucao
+    user.clean_password = '123'
+
     return user
+
+
+@pytest.fixture
+def token(client, user):
+    response = client.post(
+        '/token',
+        data={'username': user.email, 'password': user.clean_password},
+    )
+    return response.json()['access_token']

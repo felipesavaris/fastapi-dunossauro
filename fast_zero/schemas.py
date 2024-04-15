@@ -30,3 +30,12 @@ class UserSchemaIn(UserSchemaBase):
 
 class UserList(BaseModel):
     users: list[UserSchemaOut]
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
