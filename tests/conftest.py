@@ -9,11 +9,6 @@ from fast_zero.database import get_session
 from fast_zero.models import Base, User
 from fast_zero.security import get_password_hash
 
-# fixture usada quando tínhamos um DB irreal, em memória = []
-# @pytest.fixture
-# def client():
-#     return TestClient(app=app)
-
 
 @pytest.fixture
 def client(session):
@@ -39,8 +34,6 @@ def session():
         # o argumento a seguir faz com que seja possível usar a mesma conexao em todas as solicitaçoes
         poolclass=StaticPool,
     )
-    # Session = sessionmaker(bind=engine)
-    # Base.metadata.create_all(engine)
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
 
@@ -68,7 +61,7 @@ def user(session):
 @pytest.fixture
 def token(client, user):
     response = client.post(
-        '/token',
+        'auth/token',
         data={'username': user.email, 'password': user.clean_password},
     )
     return response.json()['access_token']
